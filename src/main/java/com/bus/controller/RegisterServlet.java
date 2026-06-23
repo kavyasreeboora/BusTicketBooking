@@ -1,11 +1,11 @@
 package com.bus.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 
-import com.bus.util.DBConnection;
+import com.bus.dao.UserDAO;
+import com.bus.model.User;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,26 +22,18 @@ public class RegisterServlet extends HttpServlet {
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-
-        try {
-
-            Connection con = DBConnection.getConnection();
-
-            PreparedStatement ps = con.prepareStatement(
-                    "insert into users(name,email,password) values(?,?,?)");
-
-            ps.setString(1, name);
-            ps.setString(2, email);
-            ps.setString(3, password);
-
-            int result = ps.executeUpdate();
-
-            if(result > 0) {
-                response.sendRedirect("login.jsp");
-            }
-
-        } catch(Exception e) {
-            e.printStackTrace();
+User u=new User();
+u.setName(name);
+u.setEmail(email);
+u.setPassword(password);
+UserDAO ud=new UserDAO();
+boolean b=ud.registerUser(u);
+   if(b) {
+	   response.sendRedirect("login.jsp");
+   }
+   else {
+	   
+	   response.sendRedirect("register.jsp");
         }
     }
 }

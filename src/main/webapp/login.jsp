@@ -1,30 +1,92 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>User Login</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    height: 100vh;
+}
+
+.login-card{
+    margin-top: 80px;
+    border-radius: 20px;
+}
+</style>
+
 </head>
 <body>
 
-<h2>User Login</h2>
+<div class="container">
 
-<form action="login" method="post">
+    <div class="row justify-content-center">
 
-Email:
-<input type="email" name="email" required><br><br>
+        <div class="col-md-5">
 
-Password:
-<input type="password" name="password" required><br><br>
+            <div class="card shadow-lg login-card">
 
-<input type="submit" value="Login">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>🔐 User Login</h3>
+                </div>
 
-</form>
+                <div class="card-body p-4">
 
-<br>
+                    <form action="login" method="post">
 
-<a href="register.jsp">New User? Register</a>
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email"
+                                   name="email"
+                                   class="form-control"
+                                   placeholder="Enter your email"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password"
+                                   name="password"
+                                   class="form-control"
+                                   placeholder="Enter your password"
+                                   required>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Login
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="card-footer text-center">
+
+                    New User?
+
+                    <a href="register.jsp"
+                       class="text-decoration-none fw-bold">
+                       Register
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 </body>
 </html>

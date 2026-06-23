@@ -1,12 +1,10 @@
 package com.bus.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
-import com.bus.util.DBConnection;
+import com.bus.dao.UserDAO;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,35 +22,26 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        try {
+        UserDAO dao = new UserDAO();
 
-            Connection con = DBConnection.getConnection();
+        boolean status = dao.login(email, password);
 
-            PreparedStatement ps = con.prepareStatement(
-                    "select * from users where email=? and password=?");
+        if(status) {
 
-            ps.setString(1, email);
-            ps.setString(2, password);
+            HttpSession session = request.getSession();
 
-            ResultSet rs = ps.executeQuery();
+            session.setAttribute(
+                    "userId",
+                    dao.getUserId(email, password));
 
-            if(rs.next()) {
+            response.sendRedirect("search.jsp");
+        }
+        else {
 
-                HttpSession session = request.getSession();
+            RequestDispatcher rd =
+                    request.getRequestDispatcher("login.jsp");
 
-                session.setAttribute("userId",
-                        rs.getInt("id"));
-
-                response.sendRedirect("search.jsp");
-
-            } else {
-
-                response.getWriter().println(
-                        "Invalid Email or Password");
-            }
-
-        } catch(Exception e) {
-            e.printStackTrace();
+            rd.forward(request, response);
         }
     }
 }

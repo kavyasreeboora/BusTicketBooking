@@ -1,11 +1,11 @@
 package com.bus.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
-import com.bus.util.DBConnection;
+import com.bus.dao.BookingDAO;
+import com.bus.dao.BusDAO;
+import com.bus.model.Booking;
+import com.bus.model.Bus;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,75 +20,61 @@ public class BookingServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws ServletException, IOException {
-    	
-    	response.setContentType("text/html");
 
-        int busId =
-                Integer.parseInt(request.getParameter("busId"));
+        HttpSession session = request.getSession();
 
-        int seats =
-                Integer.parseInt(request.getParameter("seats"));
+        Integer userId =
+                (Integer) session.getAttribute("userId");
 
-        try {
+        if(userId == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
 
-            Connection con = DBConnection.getConnection();
+        String busIdStr = request.getParameter("busId");
+        String seatsStr = request.getParameter("seats");
 
-            PreparedStatement ps = con.prepareStatement(
-                    "select available_seats,fare from buses where bus_id=?");
+        // Debugging
+        System.out.println("Bus ID = " + busIdStr);
+        System.out.println("Seats = " + seatsStr);
 
-            ps.setInt(1, busId);
+        if(busIdStr == null || busIdStr.trim().isEmpty() ||
+           seatsStr == null || seatsStr.trim().isEmpty()) {
 
-            ResultSet rs = ps.executeQuery();
+            response.sendRedirect("booking.jsp");
+            return;
+        }
 
-            if(rs.next()) {
+        int busId = Integer.parseInt(busIdStr);
+        int seats = Integer.parseInt(seatsStr);
 
-                int available =
-                        rs.getInt("available_seats");
+        Booking booking = new Booking();
 
-                double fare =
-                        rs.getDouble("fare");
+        booking.setUserId(userId);
+        booking.setBusId(busId);
+        booking.setSeatsBooked(seats);
 
-                if(available >= seats) {
+        // Temporary
+        BusDAO busDao = new BusDAO();
 
-                    double total = fare * seats;
+        Bus bus = busDao.getBusById(busId);
 
-                    HttpSession session =
-                            request.getSession();
+        double totalAmount = bus.getFare() * seats;
 
-                    int userId =
-                            (Integer)session.getAttribute("userId");
+        booking.setTotalAmount(totalAmount);
+        BookingDAO dao = new BookingDAO();
 
-                    PreparedStatement book =
-                            con.prepareStatement(
-                                    "insert into bookings(user_id,bus_id,seats_booked,total_amount) values(?,?,?,?)");
+        boolean status = dao.bookTicket(booking);
 
-                    book.setInt(1, userId);
-                    book.setInt(2, busId);
-                    book.setInt(3, seats);
-                    book.setDouble(4, total);
+        if(status) {
 
-                    book.executeUpdate();
+            busDao.updateSeats(busId, seats);
 
-                    PreparedStatement update =
-                            con.prepareStatement(
-                                    "update buses set available_seats=available_seats-? where bus_id=?");
+            response.sendRedirect("success.jsp");
 
-                    update.setInt(1, seats);
-                    update.setInt(2, busId);
+        } else {
 
-                    update.executeUpdate();
-
-                    response.sendRedirect("success.jsp");
-
-                } else {
-
-                    response.getWriter().println(
-                            "Seats Not Available");
-                }
-            }
-
-        } catch(Exception e) {
-            e.printStackTrace();
+            response.sendRedirect("booking.jsp");
         }
     }
 }

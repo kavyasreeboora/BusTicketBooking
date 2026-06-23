@@ -1,26 +1,77 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Book Ticket</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    background: #f4f6f9;
+}
+
+.card-box {
+    margin-top: 80px;
+    padding: 25px;
+    border-radius: 12px;
+}
+</style>
+
 </head>
+
 <body>
 
-<h2>Book Ticket</h2>
+<%
+String busId = request.getParameter("busId");
+%>
 
-<form action="bookTicket" method="post">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
 
-Bus ID:
-<input type="number" name="busId" required><br><br>
+            <div class="card card-box shadow">
 
-Number Of Seats:
-<input type="number" name="seats" required><br><br>
+                <h3 class="text-center mb-4">Book Ticket</h3>
 
-<input type="submit" value="Book Ticket">
+                <form action="bookTicket" method="post">
 
-</form>
+                    <!-- Bus ID -->
+                    <div class="mb-3">
+                        <label class="form-label">Bus ID</label>
+                        <input type="number"
+                               name="busId"
+                               class="form-control"
+                               value="<%= busId == null ? "" : busId %>"
+                               readonly>
+                    </div>
+
+                    <!-- Seats -->
+                    <div class="mb-3">
+                        <label class="form-label">Number of Seats</label>
+                        <input type="number"
+                               name="seats"
+                               class="form-control"
+                               min="1"
+                               required>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn btn-success w-100">
+                        Confirm Booking
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
